@@ -1,5 +1,6 @@
 use specs::prelude::*;
 use crate::{DeltaTime, Falling, Position, Block, Field, RunState, RunStateHolder};
+use rltk::VirtualKeyCode;
 
 const FALL_TIME : f32 = 500.0;
 
@@ -15,7 +16,8 @@ impl FallingBlockSystem {
 }
 
 impl<'a> System<'a> for FallingBlockSystem {
-    type SystemData = ( ReadExpect<'a, DeltaTime>,
+    type SystemData = ( ReadExpect<'a, Option<VirtualKeyCode>>,
+                        ReadExpect<'a, DeltaTime>,
                         ReadExpect<'a, Field>,
                         WriteExpect<'a, RunStateHolder>,
                         WriteStorage<'a, Falling>,
@@ -23,13 +25,18 @@ impl<'a> System<'a> for FallingBlockSystem {
                         WriteStorage<'a, Position>);
 
     fn run(&mut self, data: Self::SystemData) {
-        let (dt, field,mut state, mut falling, blocks, mut positions) = data;
+        let (key, dt, field,mut state, mut falling, blocks, mut positions) = data;
 
         if falling.is_empty() { return; }
 
         // Advance falling timer
+        let mut fall_time = FALL_TIME;
+        if let Some(key) = *key {
+            fall_time = FALL_TIME/5.0;
+        }
+
         self.timer += dt.0;
-        if self.timer < FALL_TIME {return;}
+        if self.timer < fall_time {return;}
         self.timer = 0.0;
 
         let mut stop_falling = false;

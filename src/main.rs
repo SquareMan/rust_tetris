@@ -1,4 +1,4 @@
-use rltk::{GameState, BTerm, RGB};
+use rltk::{GameState, BTerm, RGB, VirtualKeyCode};
 use specs::prelude::*;
 
 mod components;
@@ -71,8 +71,9 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
 
-        //Update delta-time
+        //Update resources
         *self.world.write_resource::<DeltaTime>() = DeltaTime(ctx.frame_time_ms);
+        *self.world.write_resource::<Option<VirtualKeyCode>>() = ctx.key;
 
         let state = self.world.fetch::<RunStateHolder>().0;
         match state {
@@ -107,6 +108,7 @@ fn main() -> rltk::BError {
     gs.world.insert(DeltaTime(ctx.frame_time_ms));
     gs.world.insert(rltk::RandomNumberGenerator::new());
     gs.world.insert(RunStateHolder(RunState::ReadyToSpawn));
+    gs.world.insert(ctx.key);
 
     rltk::main_loop(ctx, gs)
 }
