@@ -34,14 +34,15 @@ impl<'a> System<'a> for FieldClearingSystem {
 
         state.0 = RunState::ReadyToSpawn;
 
-        if cleared_lines.is_empty() { return; }
+        let num_lines = cleared_lines.len() as i32;
+        if num_lines < 1 { return; }
 
         for (entity, _block, position) in (&entities, &blocks, &mut positions).join() {
             if cleared_lines.contains(&position.y) {
                 entities.delete(entity).expect("Unable to delete cleared blocks");
             }
             else if position.y < top_line {
-                position.y += 1;
+                position.y += num_lines;
             }
         }
     }
