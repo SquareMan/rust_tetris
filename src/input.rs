@@ -1,6 +1,6 @@
 use specs::prelude::*;
 use rltk::{Rltk,VirtualKeyCode};
-use crate::{Block, Position, Field, Falling, FIELD_WIDTH, FIELD_HEIGHT, Center};
+use crate::{Block, Position, Field, Falling, Center};
 
 pub fn read_input(world: &mut World, ctx: &Rltk) {
     match ctx.key {
@@ -33,14 +33,29 @@ fn try_rotate(world: &mut World) {
 
     // 'O' block doesn't rotate
     if let Some(center_pos) = center_pos {
+        let mut target_positions = Vec::new();
         for (_blocks, _falling, pos) in (&blocks, &falling, &mut positions).join() {
             let rel_x = pos.x - center_pos.x;
             let rel_y = pos.y - center_pos.y;
 
-            pos.x = center_pos.x - rel_y;
-            pos.y = center_pos.y + rel_x;
+            let target = Position {
+                x: center_pos.x - rel_y,
+                y: center_pos.y + rel_x
+            };
+
+            // TODO: Wall-kicking
+            if field.is_tile_blocked(target.x, target.y) {
+                return;
+            }
+            target_positions.push((pos, target));
+        }
+
+        for (pos, new_pos) in target_positions {
+            pos.x = new_pos.x;
+            pos.y = new_pos.y;
         }
     }
+
 }
 
 fn try_move(world: &mut World, x: i32) {
