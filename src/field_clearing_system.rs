@@ -16,6 +16,7 @@ impl<'a> System<'a> for FieldClearingSystem {
         if state.0 != RunState::ReadyToClear { return; }
 
         let mut cleared_lines = Vec::new();
+        let mut top_line = FIELD_HEIGHT as i32;
         for y in 0..FIELD_HEIGHT as i32 {
             let mut line_cleared = true;
             for x in 0..FIELD_WIDTH as i32 {
@@ -27,6 +28,7 @@ impl<'a> System<'a> for FieldClearingSystem {
 
             if line_cleared {
                 cleared_lines.push(y);
+                top_line = std::cmp::min(y,top_line);
             }
         }
 
@@ -37,6 +39,9 @@ impl<'a> System<'a> for FieldClearingSystem {
         for (entity, _block, position) in (&entities, &blocks, &mut positions).join() {
             if cleared_lines.contains(&position.y) {
                 entities.delete(entity).expect("Unable to delete cleared blocks");
+            }
+            else if position.y < top_line {
+                position.y += 1;
             }
         }
     }
