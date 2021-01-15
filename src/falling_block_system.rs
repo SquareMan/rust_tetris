@@ -32,7 +32,9 @@ impl<'a> System<'a> for FallingBlockSystem {
         // Advance falling timer
         let mut fall_time = FALL_TIME;
         if let Some(key) = *key {
-            fall_time = FALL_TIME/5.0;
+            if key == VirtualKeyCode::Down {
+                fall_time = FALL_TIME/5.0;
+            }
         }
 
         self.timer += dt.0;

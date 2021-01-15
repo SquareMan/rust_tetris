@@ -1,4 +1,4 @@
-use rltk::{GameState, BTerm, RGB, VirtualKeyCode};
+use rltk::{GameState, BTerm, VirtualKeyCode};
 use specs::prelude::*;
 
 mod components;
