@@ -1,14 +1,20 @@
+use crate::Position;
+
 pub const FIELD_WIDTH: usize = 10;
 pub const FIELD_HEIGHT: usize = 20;
 
 pub struct Field {
     pub blocked_tiles: Vec<bool>,
+    pub ghost_tiles: Vec<Position>,
+    pub ghost_dirty: bool,
 }
 
 impl Field {
     pub fn new() -> Field {
         Field {
             blocked_tiles: vec![false; FIELD_WIDTH * FIELD_HEIGHT],
+            ghost_tiles: Vec::new(),
+            ghost_dirty: true,
         }
     }
 

@@ -15,7 +15,7 @@ pub fn read_input(world: &mut World, ctx: &Rltk) {
 }
 
 fn try_rotate(world: &mut World) {
-    let field = world.fetch::<Field>();
+    let mut field = world.fetch_mut::<Field>();
     let blocks = world.read_storage::<Block>();
     let mut positions = world.write_storage::<Position>();
     let falling = world.read_storage::<Falling>();
@@ -56,11 +56,12 @@ fn try_rotate(world: &mut World) {
             pos.x = new_pos.x;
             pos.y = new_pos.y;
         }
+        field.ghost_dirty = true;
     }
 }
 
 fn try_move(world: &mut World, x: i32) {
-    let field = world.fetch::<Field>();
+    let mut field = world.fetch_mut::<Field>();
     let blocks = world.read_storage::<Block>();
     let mut positions = world.write_storage::<Position>();
     let falling = world.read_storage::<Falling>();
@@ -77,5 +78,6 @@ fn try_move(world: &mut World, x: i32) {
         for (_blocks, _falling, pos) in (&blocks, &falling, &mut positions).join() {
             pos.x += x;
         }
+        field.ghost_dirty = true;
     }
 }
