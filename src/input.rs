@@ -1,6 +1,6 @@
+use crate::{Block, Center, Falling, Field, Position};
+use rltk::{Rltk, VirtualKeyCode};
 use specs::prelude::*;
-use rltk::{Rltk,VirtualKeyCode};
-use crate::{Block, Position, Field, Falling, Center};
 
 pub fn read_input(world: &mut World, ctx: &Rltk) {
     match ctx.key {
@@ -10,7 +10,7 @@ pub fn read_input(world: &mut World, ctx: &Rltk) {
             VirtualKeyCode::Right => try_move(world, 1),
             VirtualKeyCode::RShift => try_rotate(world),
             _ => {}
-        }
+        },
     }
 }
 
@@ -23,7 +23,9 @@ fn try_rotate(world: &mut World) {
 
     let mut falling_positions = Vec::new();
     let mut center_pos = None;
-    for (_blocks, _falling, pos, center) in (&blocks, &falling, &mut positions, (&center).maybe()).join() {
+    for (_blocks, _falling, pos, center) in
+        (&blocks, &falling, &mut positions, (&center).maybe()).join()
+    {
         falling_positions.push(*pos);
 
         if let Some(_) = center {
@@ -40,7 +42,7 @@ fn try_rotate(world: &mut World) {
 
             let target = Position {
                 x: center_pos.x - rel_y,
-                y: center_pos.y + rel_x
+                y: center_pos.y + rel_x,
             };
 
             // TODO: Wall-kicking
@@ -55,7 +57,6 @@ fn try_rotate(world: &mut World) {
             pos.y = new_pos.y;
         }
     }
-
 }
 
 fn try_move(world: &mut World, x: i32) {
@@ -73,7 +74,7 @@ fn try_move(world: &mut World, x: i32) {
     }
 
     if legal_move {
-        for(_blocks, _falling, pos) in (&blocks, &falling, &mut positions).join() {
+        for (_blocks, _falling, pos) in (&blocks, &falling, &mut positions).join() {
             pos.x += x;
         }
     }

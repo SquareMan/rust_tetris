@@ -1,25 +1,25 @@
-use rltk::{GameState, BTerm, VirtualKeyCode};
+use rltk::{BTerm, GameState, VirtualKeyCode};
 use specs::prelude::*;
 
+mod block_spawning_system;
 mod components;
+mod falling_block_system;
 mod field;
+mod field_clearing_system;
+mod field_indexing_system;
 mod gui;
 mod input;
 mod rendering_system;
-mod falling_block_system;
-mod field_indexing_system;
-mod field_clearing_system;
-mod block_spawning_system;
 
+use crate::block_spawning_system::BlockSpawningSystem;
+use crate::falling_block_system::FallingBlockSystem;
+use crate::field_clearing_system::FieldClearingSystem;
+use crate::field_indexing_system::FieldIndexingSystem;
+use crate::gui::draw_gui;
+use crate::input::read_input;
+use crate::rendering_system::render;
 pub use components::*;
 pub use field::*;
-use crate::rendering_system::render;
-use crate::falling_block_system::FallingBlockSystem;
-use crate::gui::draw_gui;
-use crate::field_indexing_system::FieldIndexingSystem;
-use crate::field_clearing_system::FieldClearingSystem;
-use crate::block_spawning_system::BlockSpawningSystem;
-use crate::input::read_input;
 
 #[derive(Default)]
 pub struct DeltaTime(f32);
@@ -31,7 +31,7 @@ pub struct RunStateHolder(RunState);
 pub enum RunState {
     Falling,
     ReadyToClear,
-    ReadyToSpawn
+    ReadyToSpawn,
 }
 impl Default for RunState {
     fn default() -> Self {
