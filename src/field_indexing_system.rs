@@ -1,5 +1,5 @@
 use crate::gui::FIELD_Y;
-use crate::{Falling, Field, Position, RunState, RunStateHolder, FIELD_HEIGHT};
+use crate::{Falling, Field, Position, RunState, RunStateHolder, FIELD_HEIGHT, Held};
 use specs::prelude::*;
 
 pub struct FieldIndexingSystem {}
@@ -10,15 +10,16 @@ impl<'a> System<'a> for FieldIndexingSystem {
         WriteExpect<'a, Field>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Falling>,
+        ReadStorage<'a, Held>
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (runstate, mut field, positions, falling) = data;
+        let (runstate, mut field, positions, falling, held) = data;
 
         for i in 0..field.blocked_tiles.len() {
             field.blocked_tiles[i] = false;
         }
-        for (pos, ()) in (&positions, !&falling).join() {
+        for (pos, (), _) in (&positions, !&falling, !&held).join() {
             if pos.y < 0 {
                 continue;
             }

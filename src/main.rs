@@ -104,6 +104,7 @@ fn main() -> rltk::BError {
     gs.world.register::<Block>();
     gs.world.register::<Falling>();
     gs.world.register::<Center>();
+    gs.world.register::<Held>();
 
     gs.world.insert(Field::new());
     gs.world.insert(DeltaTime(ctx.frame_time_ms));

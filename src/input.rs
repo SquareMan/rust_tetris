@@ -1,4 +1,4 @@
-use crate::{Block, Center, Falling, Field, Position};
+use crate::{Block, Center, Falling, Field, Position, Held, RunStateHolder, RunState};
 use rltk::{Rltk, VirtualKeyCode};
 use specs::prelude::*;
 
@@ -9,9 +9,34 @@ pub fn read_input(world: &mut World, ctx: &Rltk) {
             VirtualKeyCode::Left => try_move(world, -1),
             VirtualKeyCode::Right => try_move(world, 1),
             VirtualKeyCode::RShift => try_rotate(world),
+            VirtualKeyCode::RControl |
+            VirtualKeyCode::LControl => try_hold(world),
             _ => {}
         },
     }
+}
+
+fn try_hold(world: &mut World) {
+    let updater = world.fetch::<LazyUpdate>();
+    let entities = world.entities();
+    let falling_storage = world.read_storage::<Falling>();
+    let held_storage = world.write_storage::<Held>();
+
+    for (entity, falling, held) in (&entities, (&falling_storage).maybe(), (&held_storage).maybe()).join() {
+        if held.is_some() {
+            updater.remove::<Held>(entity);
+            updater.insert(entity, Falling{});
+        } else if falling.is_some() {
+            updater.insert(entity, Held {});
+            updater.remove::<Falling>(entity);
+        }
+    }
+
+    updater.exec(move |world| {
+        if world.read_storage::<Falling>().is_empty() {
+            world.fetch_mut::<RunStateHolder>().0 = RunState::ReadyToSpawn;
+        }
+    })
 }
 
 fn try_rotate(world: &mut World) {

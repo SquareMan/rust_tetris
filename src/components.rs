@@ -15,6 +15,9 @@ pub struct Block {
 }
 
 #[derive(Component, Debug)]
+pub struct Held {}
+
+#[derive(Component, Debug)]
 pub struct Falling {}
 
 #[derive(Component, Debug)]

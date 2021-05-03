@@ -1,4 +1,4 @@
-use crate::{gui, Field};
+use crate::{gui, Field, Held};
 use crate::{Block, Position};
 use rltk::{Rltk, RGB};
 use specs::prelude::*;
@@ -7,6 +7,7 @@ pub fn render(world: &World, ctx: &mut Rltk) {
     let field = world.fetch::<Field>();
     let blocks = world.read_storage::<Block>();
     let positions = world.read_storage::<Position>();
+    let held = world.read_storage::<Held>();
 
     // Render ghosts
     for pos in field.ghost_tiles.iter() {
@@ -20,16 +21,27 @@ pub fn render(world: &World, ctx: &mut Rltk) {
     }
 
     //Render blocks
-    for (block, position) in (&blocks, &positions).join() {
-        if position.y < 0 {
-            continue;
+    for (block, position, held) in (&blocks, &positions, (&held).maybe()).join() {
+        if held.is_some() {
+            ctx.set(
+                position.x + gui::HELD_X as i32,
+                position.y + gui::HELD_Y as i32,
+                block.fg,
+                block.bg,
+                rltk::to_cp437('#'),
+            );
         }
-        ctx.set(
-            position.x + gui::FIELD_X as i32,
-            position.y + gui::FIELD_Y as i32,
-            block.fg,
-            block.bg,
-            rltk::to_cp437('#'),
-        );
+        else {
+            if position.y < 0 {
+                continue;
+            }
+            ctx.set(
+                position.x + gui::FIELD_X as i32,
+                position.y + gui::FIELD_Y as i32,
+                block.fg,
+                block.bg,
+                rltk::to_cp437('#'),
+            );
+        }
     }
 }
